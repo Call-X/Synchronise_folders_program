@@ -9,20 +9,21 @@ import filecmp
 
 
 class Synchro(object):
-    def __init__(self, source_folder, destination_folder, log_file_path):
+    def __init__(self, source_folder, destination_folder, log_file_path, synchronisation_content):
         
         self.source_folder = os.path.abspath(source_folder)
         self.destination_folder = os.path.abspath(destination_folder)
         self.log_file_path = os.path.abspath(log_file_path)
         self.copyfiles = None
         self.sched = BlockingScheduler(timezone=pytz.timezone('Europe/Berlin'))
+        self.synchronisation_content = synchronisation_content
         self.logging = logging
+        self.logging.basicConfig(filename=self.log_file_path, level=logging.DEBUG,format="%(asctime)s %(message)s")
         
     def initial_copy(self):
         self.copyfiles = copytree(self.source_folder, self.destination_folder, symlinks=True, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False)
 
     def log_path_folder(self):
-        self.logging.basicConfig(filename=self.log_file_path, level=logging.DEBUG,format="%(asctime)s %(message)s")
         self.logging.debug("Logging test...")
         self.logging.info("The program is working as expected")
         self.logging.warning("The program may not function properly")
@@ -31,13 +32,13 @@ class Synchro(object):
              
     def synchronise(self):
         print('Tick! The time is: %s' % datetime.now())
-        self.compare_directories(self.source_folder, self.destination_folder)
+        self.compare_files_directories(self.source_folder, self.destination_folder)
 
-    def compare_directories(self, left, right):
+    def compare_files_directories(self, left, right):
         comparison = filecmp.dircmp(left, right)
         if comparison.common_dirs:
-            for d in comparison.common_dirs:
-                self.compare_directories(os.path.join(left, d), os.path.join(right, d))
+            for dir in comparison.common_dirs:
+                self.compare_files_directories(os.path.join(left, dir), os.path.join(right, dir))
         if comparison.left_only:
             self.copy_files(comparison.left_only, left, right)
         left_newer = []
@@ -55,12 +56,12 @@ class Synchro(object):
             if os.path.isdir(srcpath):
                 shutil.copytree(srcpath, os.path.join(dest, os.path.basename(file)))
                 print('Copied directory \"' + os.path.basename(srcpath) + '\" from \"' + os.path.dirname(srcpath) + '\" to \"' + dest + '\"')
-                self.logging.info('the file was copied with success from the source_folder to the destination folder')
+                self.logging.info('Copied directory \"' + os.path.basename(srcpath) + '\" from \"' + os.path.dirname(srcpath) + '\" to \"' + dest + '\"')
             else:
                 shutil.copy2(srcpath, dest)
                 print('Copied \"' + os.path.basename(srcpath) + '\" from \"' + os.path.dirname(srcpath) + '\" to \"' + dest + '\"')
-                self.logging.info('the file was copied with success from the source_folder to the destination folder')
+                self.logging.info('Copied \"' + os.path.basename(srcpath) + '\" from \"' + os.path.dirname(srcpath) + '\" to \"' + dest + '\"')
              
     def periodic_save(self):
-        self.sched.add_job(self.synchronise,'interval', seconds=20)
+        self.sched.add_job(self.synchronise,'interval', seconds=int(self.synchronisation_content))
         self.sched.start()
