@@ -31,9 +31,10 @@ pip install -r requirements.txt
 
 ## How to use ?
 
-1. Finally, run the server with :
+1. Finally, run the synchroniser program with :
+Your <synchronisation_content> has to be express in seconds
 ``` 
-python main.py <source_folder_path> <destination_folder_path> log_file.txt
+python main.py <source_folder_path> <destination_folder_path> <log_file.txt> <synchronisation_content>
 ``` 
 ## Contributeur :
 
