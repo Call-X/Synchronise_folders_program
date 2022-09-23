@@ -22,18 +22,13 @@ class Synchro(object):
         
     def initial_copy(self):
         self.copyfiles = copytree(self.source_folder, self.destination_folder, symlinks=True, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False)
-
-    def log_path_folder(self):
-        self.logging.debug("Logging test...")
-        self.logging.info("The program is working as expected")
-        self.logging.warning("The program may not function properly")
-        self.logging.error("The program encountered an error")
-        self.logging.critical("The program crashed")
-             
+        self.logging.info
+ 
     def synchronise(self):
         print('Tick! The time is: %s' % datetime.now())
         self.compare_files_directories(self.source_folder, self.destination_folder)
-
+        self.logging.info
+        
     def compare_files_directories(self, left, right):
         comparison = filecmp.dircmp(left, right)
         if comparison.common_dirs:
