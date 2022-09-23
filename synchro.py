@@ -22,12 +22,12 @@ class Synchro(object):
         
     def initial_copy(self):
         self.copyfiles = copytree(self.source_folder, self.destination_folder, symlinks=True, ignore=None, copy_function=copy2, ignore_dangling_symlinks=False)
-        self.logging.info
+        self.logging.info("Initial copy from folder" + self.source_folder + " to destination folder" + self.destination_folder)
  
     def synchronise(self):
         print('Tick! The time is: %s' % datetime.now())
         self.compare_files_directories(self.source_folder, self.destination_folder)
-        self.logging.info
+        self.logging.info("informations from folder" + self.source_folder + " are synchronize with success to destination folder" + self.destination_folder)
         
     def compare_files_directories(self, left, right):
         comparison = filecmp.dircmp(left, right)
